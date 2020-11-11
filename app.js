@@ -32,7 +32,7 @@ async function main() {
         const alias = `#xmpp_${iterator.replace('@', '_')}:matrix.org`;
         console.log("Handling", alias);
         console.log("Joining room");
-        const joinResult = await userClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`, {});
+        const joinResult = await userClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`, {'test': 'data'});
         const roomId = joinResult.data.room_id;
 
         assert(roomId);
