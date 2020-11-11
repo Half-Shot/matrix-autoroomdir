@@ -48,6 +48,7 @@ async function main() {
                 console.log("Joining room (again)");
                 joinResult = await userClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`);
             }
+            throw ex;
         }
         roomId = joinResult.data.room_id;
 
