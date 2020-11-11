@@ -30,20 +30,26 @@ async function main() {
     // Run cycle
     for (const iterator of ROOM_PARTS) {
         const alias = `#xmpp_${iterator.replace('@', '_')}:matrix.org`;
-
+        console.log("Handling", alias);
+        console.log("Joining room");
         const joinResult = await bridgeClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`, {});
         const roomId = joinResult.data.room_id;
 
         assert(roomId);
+        console.log("Fetching PLs");
         const powerLevels = (await bridgeClient.get(`/_matrix/client/r0/rooms/${encodeURIComponent(roomId)}/state/m.room.power_levels/`)).data;
-        powerLevels.users[userId] = MIN_PL_FOR_DIRECTORY;
+        if (powerLevels.users[userId] !== MIN_PL_FOR_DIRECTORY) {
+            powerLevels.users[userId] = MIN_PL_FOR_DIRECTORY;
+            console.log("Applying PLs");
+            // Put the new PLs
+            await bridgeClient.put(`/_matrix/client/r0/rooms/${encodeURIComponent(roomId)}/state/m.room.power_levels/`, powerLevels);
+        }
 
-        // Put the new PLs
-        await bridgeClient.put(`/_matrix/client/r0/rooms/${encodeURIComponent(roomId)}/state/m.room.power_levels/`, powerLevels);
         for(let i = 0; i < 3; i++) {
+            console.log("Setting directory");
             await new Promise((r) => setTimeout(r, 10000)); // Wait a bit for the change to propagate over federation.
             try {
-                await userClient.put(`/_matrix/client/r0/directory/list/room/${encodeURIComponent(alias)}`, {
+                await userClient.put(`/_matrix/client/r0/directory/list/room/${encodeURIComponent(roomId)}`, {
                     visibility: "public",
                 });
                 break;
@@ -54,6 +60,7 @@ async function main() {
         }
 
         // Reset the PLs
+        console.log("Removing PLs");
         delete powerLevels.users[userId];
         await bridgeClient.put(`/_matrix/client/r0/rooms/${encodeURIComponent(roomId)}/state/m.room.power_levels/`, powerLevels);
     }
