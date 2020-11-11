@@ -34,17 +34,22 @@ async function main() {
         console.log("Handling", alias);
         console.log("Joining room");
         let joinResult;
+        let roomId;
         try {
             joinResult = await userClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`);
         } catch (ex) {
             if (ex.response.data.errcode === 'M_FORBIDDEN') {
                 console.log("Room is invite-only, inviting first.");
+                console.log("Joining bridge...");
+                const bridgeJoinResult = await bridgeClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`);
+                roomId = bridgeJoinResult.data.room_id;
+                console.log("Inviting user");
                 await bridgeClient.get(`/_matrix/client/r0/rooms/${encodeURIComponent(roomId)}/invite`, { user_id: userId });
                 console.log("Joining room (again)");
                 joinResult = await userClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`);
             }
         }
-        const roomId = joinResult.data.room_id;
+        roomId = joinResult.data.room_id;
 
         assert(roomId);
         console.log("Fetching PLs");
@@ -75,7 +80,7 @@ async function main() {
         delete powerLevels.users[userId];
         await bridgeClient.put(`/_matrix/client/r0/rooms/${encodeURIComponent(roomId)}/state/m.room.power_levels/`, powerLevels);
         console.log("Leaving");
-        await bridgeClient.post(`/_matrix/client/r0/rooms/${encodeURIComponent(roomId)}/leave`, {});
+        await userClient.post(`/_matrix/client/r0/rooms/${encodeURIComponent(roomId)}/leave`, {});
     }
 }
 
