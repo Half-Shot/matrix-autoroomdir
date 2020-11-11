@@ -1,4 +1,5 @@
 const axios = require('axios');
+const assert = require('assert').strict;
 const ROOM_PARTS = require('./roomparts.json');
 const BRIDGE_ACCESS_TOKEN = process.env.BRIDGE_ACCESS_TOKEN;
 const USER_ACCESS_TOKEN = process.env.USER_ACCESS_TOKEN;
