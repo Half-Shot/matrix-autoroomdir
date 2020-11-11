@@ -33,6 +33,17 @@ async function main() {
         const alias = `#xmpp_${iterator.replace('@', '_')}:matrix.org`;
         console.log("Handling", alias);
         console.log("Joining room");
+        let joinResult;
+        try {
+            joinResult = await userClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`, {'test': 'data'});
+        } catch (ex) {
+            if (ex.response.data.errcode === 'M_FORBIDDEN') {
+                console.log("Room is invite-only, inviting first.");
+                await bridgeClient.get(`/_matrix/client/r0/rooms/${encodeURIComponent(roomId)}/invite`, { user_id: userId });
+                console.log("Joining room (again)");
+                joinResult = await userClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`, {'test': 'data'});
+            }
+        }
         const joinResult = await userClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`, {'test': 'data'});
         const roomId = joinResult.data.room_id;
 
