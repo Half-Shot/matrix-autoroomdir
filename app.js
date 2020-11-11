@@ -44,7 +44,7 @@ async function main() {
                 const bridgeJoinResult = await bridgeClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`);
                 roomId = bridgeJoinResult.data.room_id;
                 console.log("Inviting user");
-                await bridgeClient.get(`/_matrix/client/r0/rooms/${encodeURIComponent(roomId)}/invite`, { user_id: userId });
+                await bridgeClient.post(`/_matrix/client/r0/rooms/${encodeURIComponent(roomId)}/invite`, { user_id: userId });
                 console.log("Joining room (again)");
                 joinResult = await userClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`);
             }
