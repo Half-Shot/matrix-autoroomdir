@@ -47,7 +47,7 @@ async function main() {
 
         for(let i = 0; i < 3; i++) {
             console.log("Setting directory");
-            await new Promise((r) => setTimeout(r, 10000)); // Wait a bit for the change to propagate over federation.
+            await new Promise((r) => setTimeout(r, 5000)); // Wait a bit for the change to propagate over federation.
             try {
                 await userClient.put(`/_matrix/client/r0/directory/list/room/${encodeURIComponent(roomId)}`, {
                     visibility: "public",
@@ -56,13 +56,15 @@ async function main() {
             } catch (ex) {
                 console.log("Setting directory failed", ex);
             }
-            console.log("Trying again in 10s")
+            console.log("Trying again in 5s")
         }
 
         // Reset the PLs
         console.log("Removing PLs");
         delete powerLevels.users[userId];
         await bridgeClient.put(`/_matrix/client/r0/rooms/${encodeURIComponent(roomId)}/state/m.room.power_levels/`, powerLevels);
+        console.log("Leaving");
+        await bridgeClient.post(`/_matrix/client/r0/rooms/${encodeURIComponent(roomId)}/leave`, {});
     }
 }
 
