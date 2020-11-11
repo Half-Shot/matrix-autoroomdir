@@ -16,7 +16,8 @@ const userClient = axios.create({
     baseURL: process.env.CLIENT_URL,
     headers: {
         'Authorization': `Bearer ${USER_ACCESS_TOKEN}`
-    }
+    },
+    method: 'post'
 });
 
 async function main() {
