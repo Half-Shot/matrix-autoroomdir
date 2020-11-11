@@ -26,9 +26,9 @@ async function main() {
     // Run cycle
     for (const iterator of ROOM_PARTS) {
         const alias = `#xmpp_${iterator.replace('@', '_')}:matrix.org`;
-        const [ room_id ] = (await bridgeClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`, {})).data;
-        const powerLevels = (await bridgeClient.get(`/_matrix/client/r0/rooms/${encodeURIComponent(room_id)}/state/m.room.power_levels/`)).data;
-        console.log(alias);
+        const joinResult = await bridgeClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`, {});
+        const roomId = joinResult.data.room_id;
+        const powerLevels = (await bridgeClient.get(`/_matrix/client/r0/rooms/${encodeURIComponent(roomId)}/state/m.room.power_levels/`)).data;
         console.log(powerLevels);
     }
 }
