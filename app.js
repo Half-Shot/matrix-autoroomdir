@@ -39,14 +39,20 @@ async function main() {
             joinResult = await userClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`);
         } catch (ex) {
             if (ex.response.data.errcode === 'M_FORBIDDEN') {
-                console.log("Room is invite-only, inviting first.");
-                console.log("Joining bridge...");
-                const bridgeJoinResult = await bridgeClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`);
-                roomId = bridgeJoinResult.data.room_id;
-                console.log("Inviting user");
-                await bridgeClient.post(`/_matrix/client/r0/rooms/${encodeURIComponent(roomId)}/invite`, { user_id: userId });
-                console.log("Joining room (again)");
-                joinResult = await userClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`);
+                console.log(`Skipping ${alias}, forbidden`);
+                continue;
+                // console.log("Room is invite-only, inviting first.");
+                // console.log("Joining bridge...");
+                // const bridgeJoinResult = await bridgeClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`);
+                // roomId = bridgeJoinResult.data.room_id;
+                // console.log("Inviting user");
+                // await bridgeClient.post(`/_matrix/client/r0/rooms/${encodeURIComponent(roomId)}/invite`, { user_id: userId });
+                // console.log("Joining room (again)");
+                // joinResult = await userClient.post(`/_matrix/client/r0/join/${encodeURIComponent(alias)}`);
+            }
+            if (ex.response.data.errcode === 'M_NOT_FOUND') {
+                console.log(`Skipping ${alias}, not found`);
+                continue;
             }
             throw ex;
         }
