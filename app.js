@@ -7,14 +7,14 @@ const ROOM_PARTS = [
 const bridgeClient = axios.create({
     baseURL: process.env.BRIDGE_URL,
     headers: {
-        'Authentication': `Bearer ${BRIDGE_ACCESS_TOKEN}`
+        'Authorization': `Bearer ${BRIDGE_ACCESS_TOKEN}`
     }
 });
 
 const userClient = axios.create({
     baseURL: process.env.CLIENT_URL,
     headers: {
-        'Authentication': `Bearer ${USER_ACCESS_TOKEN}`
+        'Authorization': `Bearer ${USER_ACCESS_TOKEN}`
     }
 });
 
